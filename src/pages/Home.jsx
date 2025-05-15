@@ -64,7 +64,7 @@ const Home = () => {
           <Typography variant="h6" color="text.secondary" gutterBottom>
             A real-time chat application to connect with your friends instantly and securely.
           </Typography>
-          <NavLink to='/user/chat/dashboard'>
+          <NavLink to='/user/dashboard'>
           <Button
             variant="contained"
             size="large"

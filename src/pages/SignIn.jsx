@@ -30,7 +30,7 @@ const SignIn = () => {
       console.log(res.data.token)
 
       localStorage.setItem('token', res.data.token)
-      navigate('/user/chat/dashboard'); // Change as per your route after login
+      navigate('/user/dashboard'); // Change as per your route after login
     } catch (err) {
       console.error('Login failed:', err.response?.data || err.message);
     }
