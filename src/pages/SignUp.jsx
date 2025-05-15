@@ -9,12 +9,17 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+import { useNavigate } from 'react-router-dom';
+
+
 const SignUp = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
   });
+
+const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,9 +29,10 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/register', formData);
-      console.log('User registered:', res.data);
-      // You can redirect or show success here
+    //  await axios.post(`${import.meta.env.VITE_APP_API_URL}/register`, formData);
+      await axios.post('http://localhost:5000/register', formData);
+      navigate('/signin')
+     
     } catch (err) {
       console.error('Registration failed:', err.response?.data || err.message);
     }
