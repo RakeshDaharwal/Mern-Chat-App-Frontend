@@ -26,8 +26,11 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/signin', formData);
-      navigate('/dashboard'); // Change as per your route after login
+      const res = await axios.post(`${import.meta.env.VITE_APP_API_URL}/sign-in`, formData);
+      console.log(res.data.token)
+
+      localStorage.setItem('token',res.data.token)
+      navigate('/user/chat/dashboard'); // Change as per your route after login
     } catch (err) {
       console.error('Login failed:', err.response?.data || err.message);
     }

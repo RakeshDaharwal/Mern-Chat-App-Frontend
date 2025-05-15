@@ -29,8 +29,8 @@ const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-    //  await axios.post(`${import.meta.env.VITE_APP_API_URL}/register`, formData);
-      await axios.post('http://localhost:5000/register', formData);
+     await axios.post(`${import.meta.env.VITE_APP_API_URL}/register`, formData);
+      
       navigate('/signin')
      
     } catch (err) {
