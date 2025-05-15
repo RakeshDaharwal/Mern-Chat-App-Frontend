@@ -8,7 +8,7 @@ import {
   Paper
 } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ const SignIn = () => {
       const res = await axios.post(`${import.meta.env.VITE_APP_API_URL}/sign-in`, formData);
       console.log(res.data.token)
 
-      localStorage.setItem('token',res.data.token)
+      localStorage.setItem('token', res.data.token)
       navigate('/user/chat/dashboard'); // Change as per your route after login
     } catch (err) {
       console.error('Login failed:', err.response?.data || err.message);
@@ -87,9 +87,18 @@ const SignIn = () => {
                 },
               }}
             >
-              Login
+              Sign In
             </Button>
           </Box>
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Don't have an account?{' '}
+            <NavLink
+              to="/signup"
+              style={{ textDecoration: 'none', color: '#1976d2' }} // customize color as needed
+            >
+              Sign Up
+            </NavLink>
+          </Typography>
         </Paper>
       </Container>
     </Box>

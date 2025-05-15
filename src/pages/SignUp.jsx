@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 
 
 const SignUp = () => {
@@ -100,9 +100,18 @@ const navigate = useNavigate();
               },
             }}
           >
-            Register
+            Sign Up
           </Button>
         </Box>
+           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+             Already have an account?{' '}
+             <NavLink
+               to="/signin"
+               style={{ textDecoration: 'none', color: '#1976d2' }} // customize color as needed
+             >
+               Sign In
+             </NavLink>
+           </Typography>       
       </Paper>
     </Container>
     </Box>
