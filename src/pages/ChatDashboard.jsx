@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Drawer,
@@ -47,31 +47,31 @@ function ChatDashboard() {
     fetchCurrentUser();
   }, []);
 
-  useEffect(() => {
+  // ✅ Move fetchMessages outside useEffect
+  const fetchMessages = useCallback(async () => {
     if (!selectedUser || !currentUserId) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/chat/${currentUserId}/${selectedUser._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessages(res.data);
 
-    const fetchMessages = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `${import.meta.env.VITE_APP_API_URL}/chat/${currentUserId}/${selectedUser._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setMessages(res.data);
-        const roomId = [currentUserId, selectedUser._id].sort().join("_");
-        socket.emit("joinRoom", roomId);
-      } catch (err) {
-        console.error("Error fetching messages:", err);
-      }
-    };
-
-    fetchMessages();
+      const roomId = [currentUserId, selectedUser._id].sort().join("_");
+      socket.emit("joinRoom", roomId);
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+    }
   }, [selectedUser, currentUserId]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedUser, currentUserId, fetchMessages]);
 
   useEffect(() => {
     socket.on("receiveMessage", (msg) => {
@@ -89,8 +89,7 @@ function ChatDashboard() {
   }, [selectedUser, currentUserId]);
 
   return (
-<Box sx={{ display: "flex", height: "100vh", bgcolor: "#f5f5f5" }}>
-      {/* Mobile Hamburger Icon */}
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f5f5f5" }}>
       {isMobile && (
         <IconButton
           onClick={() => setDrawerOpen(true)}
@@ -100,7 +99,6 @@ function ChatDashboard() {
         </IconButton>
       )}
 
-      {/* Sidebar (Desktop) */}
       {!isMobile && (
         <ChatSidebar
           currentUserName={currentUserName}
@@ -109,9 +107,8 @@ function ChatDashboard() {
         />
       )}
 
-      {/* Drawer (Mobile) */}
       <Drawer
-        anchor="right"
+        anchor="left"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       >
@@ -121,58 +118,41 @@ function ChatDashboard() {
             currentUserId={currentUserId}
             onSelectUser={(user) => {
               setSelectedUser(user);
-              setDrawerOpen(false); // Close drawer after selecting user
+              setDrawerOpen(false);
             }}
           />
         </Box>
       </Drawer>
 
-      {/* Main Chat Window */}
-      <Box  sx={{ display: "flex", height: "100vh", width:'100%', bgcolor: "#f5f5f5" }}>
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          width: "100%",
+          bgcolor: "#f5f5f5",
+        }}
+      >
         {selectedUser ? (
           <ChatWindow
             currentUserId={currentUserId}
             messages={messages}
             selectedUser={selectedUser}
+            fetchMessages={fetchMessages}
           />
-        ) : isMobile ? (
-          <Box
-            sx={{
-              height: "100%",
-              width:'100%',
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="h6" color="text.secondary"  sx={{
-              
-              textAlign: "center",
-              
-            }}>
-              No user selected
-            </Typography>
-          </Box>
         ) : (
-          <>
           <Box
             sx={{
               height: "100%",
-              width:'100%',
+              width: "100%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Typography variant="h6" color="text.secondary"  sx={{
-              
-              textAlign: "center",
-              
-            }}>
+            <Typography variant="h6" color="text.secondary" textAlign="center">
               No user selected
             </Typography>
           </Box>
-          </>
         )}
       </Box>
     </Box>
@@ -180,4 +160,3 @@ function ChatDashboard() {
 }
 
 export default ChatDashboard;
-

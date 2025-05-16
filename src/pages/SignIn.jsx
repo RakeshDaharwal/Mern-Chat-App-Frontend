@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, NavLink } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -23,18 +25,33 @@ const SignIn = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_APP_API_URL}/sign-in`, formData);
-      console.log(res.data.token)
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_APP_API_URL}/sign-in`, formData);
+    
+    // Save token
+    localStorage.setItem('token', res.data.token);
 
-      localStorage.setItem('token', res.data.token)
-      navigate('/user/dashboard'); // Change as per your route after login
-    } catch (err) {
-      console.error('Login failed:', err.response?.data || err.message);
-    }
-  };
+    // Show success alert
+    Swal.fire({
+      icon: 'success',
+      title: 'Login Successful',
+      text: 'Welcome back!',
+      confirmButtonColor: '#00C756'
+    }).then(() => {
+      navigate('/user/dashboard'); // or your protected route
+    });
+
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: err.response?.data?.message || 'Invalid credentials or server error.',
+      confirmButtonColor: '#d33'
+    });
+  }
+};
 
   return (
     <Box

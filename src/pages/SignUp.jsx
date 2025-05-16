@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 
 import { useNavigate, NavLink } from 'react-router-dom';
-
+import Swal from 'sweetalert2';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -27,17 +27,28 @@ const navigate = useNavigate();
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-     await axios.post(`${import.meta.env.VITE_APP_API_URL}/register`, formData);
-      
-      navigate('/signin')
-     
-    } catch (err) {
-      console.error('Registration failed:', err.response?.data || err.message);
-    }
-  };
+  e.preventDefault();
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_APP_API_URL}/register`, formData);
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Registration Successful',
+      text: res.data.message || 'You can now log in.',
+      confirmButtonColor: '#00C756'
+    }).then(() => {
+      navigate('/signin');
+    });
 
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Registration Failed',
+      text: err.response?.data?.message || 'Something went wrong.',
+      confirmButtonColor: '#d33'
+    });
+  }
+};
   return (
     <>
      <Box
