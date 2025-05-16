@@ -12,31 +12,13 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const ChatSidebar = () => {
+const ChatSidebar = ({ currentUserId, onSelectUser, selectedUser }) => {
   const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Fetch current logged-in user
-  const fetchCurrentUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `${import.meta.env.VITE_APP_API_URL}/user/details`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setCurrentUser(res.data);
-    } catch (err) {
-      console.error("Failed to fetch current user:", err.response?.data || err.message);
-    }
-  };
 
   // Fetch all users except current user
   const fetchUsers = async () => {
+    if (!currentUserId) return;
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
@@ -47,7 +29,11 @@ const ChatSidebar = () => {
           },
         }
       );
-      setUsers(res.data);
+
+      // Filter out the current user from the list
+      const filteredUsers = res.data.filter(user => user._id !== currentUserId);
+
+      setUsers(filteredUsers);
     } catch (err) {
       console.error("Failed to fetch users:", err.response?.data || err.message);
     } finally {
@@ -56,16 +42,23 @@ const ChatSidebar = () => {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
     fetchUsers();
-  }, []);
+  }, [currentUserId]);
 
   return (
-
-    <Box sx={{ width: 300, bgcolor: "#f9f9f9", borderRight: "1px solid #ccc", height: "100vh" }}>
+    <Box
+      sx={{
+        width: 300,
+        bgcolor: "#f9f9f9",
+        borderRight: "1px solid #ccc",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Box sx={{ p: 2, bgcolor: "#00ED64", color: "#fff" }}>
         <Typography variant="h6">
-          {currentUser ? currentUser.name : "Loading..."}
+          {currentUserId ? `User ID: ${currentUserId}` : "Loading..."}
         </Typography>
       </Box>
 
@@ -80,10 +73,15 @@ const ChatSidebar = () => {
           <CircularProgress size={24} />
         </Box>
       ) : (
-        <List>
+        <List sx={{ overflowY: "auto", flex: 1 }}>
           {users.length > 0 ? (
             users.map((user) => (
-              <ListItem key={user._id} button>
+              <ListItem
+                key={user._id}
+                button
+                selected={selectedUser?._id === user._id}
+                onClick={() => onSelectUser(user)}
+              >
                 <ListItemAvatar>
                   <Avatar>{user.name?.[0]}</Avatar>
                 </ListItemAvatar>
