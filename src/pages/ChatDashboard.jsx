@@ -25,6 +25,9 @@ function ChatDashboard() {
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem("token");
+
+        
+
         const res = await axios.get(
           `${import.meta.env.VITE_APP_API_URL}/user/details`,
           {
@@ -33,7 +36,10 @@ function ChatDashboard() {
             },
           }
         );
+
+       
         const data = res.data;
+
         setCurrentUserId(data._id);
         setCurrentUserName(data.name);
       } catch (error) {
